@@ -1,0 +1,62 @@
+name: build kmods
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      contents: write
+
+    steps:
+      - name: Set timezone
+        run: |
+          sudo timedatectl set-timezone Asia/Shanghai
+          date +"%Y-%m-%d %H:%M:%S %Z"
+          
+      - name: Display system information
+        run: |
+          date +"%Y-%m-%d %H:%M:%S %Z"
+          lscpu | grep -E '^Architecture|^CPU\(s\):|^Model name'
+          uname -sr
+          lsb_release -a
+          free -h
+          df -Th
+
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Build
+        uses: apoiston/actions@packages
+        with:
+          private_key: ${{ secrets.PRIVATE_KEY }}
+          public_key: ${{ secrets.PUBLIC_KEY }}
+          setup_sdk: ${{ secrets.SETUP_SDK }}
+          build_kmods: ${{ secrets.BUILD_KMODS }}
+          config_buildinfo: builder/config.buildinfo
+          enable_build_kmods: true
+
+      - name: Prepare
+        run: |
+          git clone --depth=1 --quiet --branch packages https://github.com/apoiston/index.git
+          sed -i "s/N\/A/$(date +"%Y-%m-%d %H:%M:%S %Z")/g" index/index.html
+          rsync -a --quiet --include="*.html" --include="*.css" --include="*.js" --exclude="*" index/ "$GITHUB_WORKSPACE/"
+          rsync -a --quiet openwrt/kmods/snapshots "$GITHUB_WORKSPACE/"
+          printf '%s' "${{ secrets.PUBLIC_KEY }}" > "$GITHUB_WORKSPACE/public-key.pem"
+
+      - name: Commit
+        run: |
+          git switch --orphan kmods
+          git add *.html *.css *.js snapshots public-key.pem
+          git commit -m "build: $(date +"%Y-%m-%d %H:%M:%S %Z") [KMODS]"
+          git push origin kmods --force
