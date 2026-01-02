@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "architecture": "x86_64",
+  "packages": {
+    "bandix": "0.11.0-r1",
+    "luci-app-bandix": "0.11.1-r1",
+    "luci-app-momo": "1.1.0-r1",
+    "luci-app-nikki": "1.25.0-r1",
+    "luci-i18n-bandix-zh-cn": "25.362.10154~b364295",
+    "luci-i18n-momo-zh-cn": "25.365.31191~5318bfe",
+    "luci-i18n-nikki-zh-cn": "25.363.27101~952ab1e",
+    "momo": "2025.12.31-r1",
+    "nikki": "2026.01.02~4d76703-r1"
+  }
+}
