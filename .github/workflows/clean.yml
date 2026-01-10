@@ -1,0 +1,56 @@
+name: Clean
+
+on:
+  push:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+  schedule:
+    - cron: "0 12 * * 0"
+
+jobs:
+  clean-pages:
+    runs-on: ubuntu-latest
+
+    # strategy:
+    #   matrix:
+    #     project_name:
+    #       - infinityapps
+    #       - infinitykmods
+    #       - infinitypackages
+         
+    # steps:
+    #   - name: Clean pages
+    #     uses: apoiston/actions@clean
+    #     with:
+    #       cloudflare_account_id: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    #       cloudflare_api_token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+    #       project_name: ${{ matrix.project_name }}
+    #       enable_clean_pages: true 
+
+    steps:      
+      - name: Clean apps
+        uses: apoiston/actions@clean
+        with:
+          cloudflare_account_id: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          cloudflare_api_token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          project_name: infinityapps
+          enable_clean_pages: true
+
+      - name: Clean kmods
+        uses: apoiston/actions@clean
+        with:
+          cloudflare_account_id: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          cloudflare_api_token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          project_name: infinitykmods
+          enable_clean_pages: true
+
+      - name: Clean packages
+        uses: apoiston/actions@clean
+        with:
+          cloudflare_account_id: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          cloudflare_api_token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          project_name: infinitypackages
+          enable_clean_pages: true
