@@ -17,18 +17,23 @@
 ### Usage
 
 ```shell
-# Add key
-wget -O /etc/apk/keys/infinityapps.pem https://infinityapps.pages.dev/public-key.pem
+# add key
+wget -O /etc/apk/keys/infinity.pem https://infinityapps.pages.dev/public-key.pem
 ```
 
 ```shell
-# Add feed
+# add feed
 echo "https://infinityapps.pages.dev/snapshots/x86_64/apps/packages.adb" >> /etc/apk/repositories.d/customfeeds.list
 ```
 
 ```shell
-# Install packages
-apk update && apk add luci-i18n-nikki-zh-cn
+# install packages
+apk add --no-cache luci-i18n-nikki-zh-cn
+```
+
+```shell
+# upgrade packages
+apk add -U nikki luci-app-nikki luci-i18n-nikki-zh-cn
 ```
 
 ### Credits
