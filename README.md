@@ -1,10 +1,6 @@
 # OpenWrt Packages
 
-### Firmware Download
-
-- [Releases](https://github.com/apoiston/builder/releases)
-
-### Credits
+## Credits
 
 - [OpenWrt](https://github.com/openwrt/openwrt)
 
