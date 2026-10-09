@@ -1,0 +1,85 @@
+Subject: [PATCH] replace removed kernel strncpy calls
+
+Use kernel string helpers compatible with Linux 7.3 while preserving
+fixed-field padding and explicitly sized Lua script copies.
+
+--- a/extensions/pknock/xt_pknock.c
++++ b/extensions/pknock/xt_pknock.c
+@@ -17,6 +17,7 @@
+ #include <linux/list.h>
+ #include <linux/proc_fs.h>
+ #include <linux/spinlock.h>
++#include <linux/string.h>
+ #include <linux/jhash.h>
+ #include <linux/random.h>
+ #include <linux/proc_fs.h>
+@@ -998,5 +1000,8 @@
+ {
+ 	struct xt_pknock_mtinfo *info = par->matchinfo;
+ 
++	if (info->rule_name_len >= sizeof(info->rule_name))
++		RETURN_ERR("Rule name is too long.\n");
++
+ 	/* Singleton. */
+ 	if (rule_hashtable == NULL) {
+--- a/extensions/xt_quota2.c
++++ b/extensions/xt_quota2.c
+@@ -18,6 +18,7 @@
+ #include <linux/seq_file.h>
+ #include <linux/skbuff.h>
+ #include <linux/spinlock.h>
++#include <linux/string.h>
+ #include <linux/uidgid.h>
+ #include <linux/version.h>
+ #include <asm/atomic.h>
+--- a/extensions/LUA/xt_LUA_target.c
++++ b/extensions/LUA/xt_LUA_target.c
+@@ -18,6 +18,7 @@
+ 
+ #include <linux/kernel.h>
+ #include <linux/slab.h>
++#include <linux/string.h>
+ #include <linux/module.h>
+ #include <linux/uaccess.h>
+ #include <net/ip.h>
+@@ -150,6 +151,7 @@
+ 	lua_setfield(env->L, -2, "STATE_ID");
+ 	lua_pop(env->L, 1); /* pop _G */
+ 
+-	strncpy(buf, script_buf, script_size);
++	memcpy_and_pad(buf, script_size, script_buf,
++		       strnlen(script_buf, script_size), 0);
+ 	ret = luaL_loadbuffer(env->L, buf, script_size, "PacketScript, loadbuffer") ||
+ 	      lua_pcall(env->L, 0, 1, 0);
+@@ -213,6 +215,9 @@
+ {
+ 	const struct xt_lua_tginfo *info = par->targinfo;
+ 
++	if (info->script_size > sizeof(info->buf))
++		return -EINVAL;
++
+ 	if (load_script_into_state(info->state_id, info->script_size, (char *)info->buf)) {
+ 		lua_state_refs[info->state_id]++;
+ 		return 0;
+--- a/extensions/LUA/lua/lobject.c
++++ b/extensions/LUA/lua/lobject.c
+@@ -180,7 +180,7 @@
+ 
+ void luaO_chunkid (char *out, const char *source, size_t bufflen) {
+   if (*source == '=') {
+-    strncpy(out, source+1, bufflen);  /* remove first char */
++    strscpy_pad(out, source+1, bufflen);  /* remove first char */
+     out[bufflen-1] = '\0';  /* ensures null termination */
+   }
+   else {  /* out = "source", or "...source" */
+--- a/extensions/LUA/lua/lstrlib.c
++++ b/extensions/LUA/lua/lstrlib.c
+@@ -754,7 +754,7 @@
+   if (isdigit(uchar(*p)))
+     luaL_error(L, "invalid format (width or precision too long)");
+   *(form++) = '%';
+-  strncpy(form, strfrmt, p - strfrmt + 1);
++  memcpy(form, strfrmt, p - strfrmt + 1);
+   form += p - strfrmt + 1;
+   *form = '\0';
+   return p;
