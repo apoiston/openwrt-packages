@@ -8,12 +8,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=nginx
-PKG_VERSION:=1.31.8
+PKG_VERSION:=1.31.9
 PKG_RELEASE:=1
 
 PKG_SOURCE:=nginx-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=https://nginx.org/download/
-PKG_HASH:=0652b760b3b772d2ec17b47c2fc15d9a95e6fe35cd5b877eadc1a62d9bc75af1
+PKG_HASH:=a11c5eeee2e257f4478f0e649f84b0040787d277d2d3e5233952aa6b6dcb80ad
 
 PKG_MAINTAINER:=Thomas Heil <heil@terminal-consulting.de> \
 				Christian Marangi <ansuelsmth@gmail.com>
@@ -293,7 +293,7 @@ define Download/nginx-mod-naxsi
   SOURCE_DATE:=2025-01-05
   SOURCE_VERSION:=b61ba37b3666b386c7a6d83fbcdf6ca3377395a1
   URL:=https://github.com/wargio/naxsi.git
-  MIRROR_HASH:=2b8bf06f8e4cee95e287158c193c4930deab097bf1491c03a95dd8b0c2682d4c
+  MIRROR_HASH:=c2f60a0f21a43aabfe4fda8665e2ef23bccc9dd73b202fad64e4212584982995
   PROTO:=git
 endef
 
